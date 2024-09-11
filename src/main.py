@@ -57,7 +57,7 @@ def update_data():
 
 def main():
     PORT = int(os.getenv('PORT', 8080))
-    logger.info(f"应用程序正在启动，端口：{PORT}")
+    logger.info(f"應用程序正在启动，端口：{PORT}")
     # 运行 Flask 应用
     app.run(host='0.0.0.0', port=PORT)
 
