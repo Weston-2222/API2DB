@@ -52,7 +52,7 @@ def update_data():
             logger.info("数据库会话已关闭")
 
     except Exception as e:
-        logger.error(f"更新过程中发生错误：{str(e)}")
+        logger.error(f"更新过程中發生错误：{str(e)}")
 
 
 def main():
