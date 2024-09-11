@@ -36,9 +36,9 @@ on:
 
 env:
   PROJECT_ID: '${{secrets.PROJECT_ID}}' # TODO: update to your Google Cloud project ID
-  REGION: '${{secret.REGION}}' # TODO: update to your region
+  REGION: '${{secrets.REGION}}' # TODO: update to your region
   SERVICE: 'API2DB' # TODO: update to your service name
-  WORKLOAD_IDENTITY_PROVIDER: '${{secret.WIF_PROVIDER}}' # TODO: update to your workload identity provider
+  WORKLOAD_IDENTITY_PROVIDER: '${{secrets.WIF_PROVIDER}}' # TODO: update to your workload identity provider
 
 jobs:
   deploy:
