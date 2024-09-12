@@ -4,54 +4,54 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
-
+# 定義環境變數，用於設定 Cloud Run 相關的項目
 env:
-  PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  REGION: ${{ secrets.REGION }}
-  APP_NAME: ${{ secrets.APP_NAME }}
-  REGISTRY_NAME: ${{ secrets.ARTIFACT_REGISTRY_NAME }}
-  SERVICE_ACCOUNT_EMAIL: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
+  CLOUD_RUN_PROJECT_ID: ${{ secrets.CLOUD_RUN_PROJECT_NAME }}
+  CLOUD_RUN_REGION: asia-northeast1
+  # 自行填入專案名稱
+  REPO_NAME: cloud-run-demo
 
+# 定義了一個名為 build-and-deploy 的工作，這個工作將運行在 ubuntu-latest 環境上。
 jobs:
   build-and-deploy:
     name: Setup, Build, and Deploy
     runs-on: ubuntu-latest
     steps:
+      # 步驟：從 GitHub 倉庫中檢出代碼。
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      # Authenticate with Google Cloud
-      - id: 'auth'
-        uses: google-github-actions/auth@v1.1.1
+      # 步驟：使用 Google Cloud Actions 設置 gcloud 並驗證服務帳戶。
+      - uses: google-github-actions/setup-gcloud@v0.2.0
         with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          project_id: ${{ secrets.CLOUD_RUN_PROJECT_NAME }}
+          service_account_key: ${{ secrets.CLOUD_RUN_SERVICE_ACCOUNT }}
+          service_account_email: ${{ secrets.CLOUD_RUN_SERVICE_ACCOUNT_EMAIL }}
 
-      # Setup gcloud CLI/SDK
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-
-      - name: Authorize Docker push
-        run: gcloud auth configure-docker $REGION-docker.pkg.dev
-
-      - name: Build and tag the docker image
+      # 步驟：啟用 Container Registry 和 Cloud Run API，並設置 Docker 認證。
+      - name: Enable the necessary APIs and enable docker auth
         run: |-
-          docker build --build-arg NODE_ENV=dev . --tag $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/$APP_NAME:$GITHUB_SHA
+          gcloud services enable containerregistry.googleapis.com
+          gcloud services enable run.googleapis.com
+          gcloud --quiet auth configure-docker
 
-      - name: Push the image to the Google Artifact Registry (GAR)
+      # 構建映像，並為鏡像添加標籤。
+      - name: Build and tag image
         run: |-
-          docker push $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/$APP_NAME:$GITHUB_SHA
+          docker build . --tag "gcr.io/$CLOUD_RUN_PROJECT_ID/$REPO_NAME:$GITHUB_SHA"
 
-      # - name: Build and push the Docker image
-      #   run: |-
-      #     gcloud builds submit . --tag $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/$APP_NAME:$GITHUB_SHA
+      # 將映像推送到 Google Container Registry。
+      - name: Push image to GCR
+        run: |-
+          docker push gcr.io/$CLOUD_RUN_PROJECT_ID/$REPO_NAME:$GITHUB_SHA
 
+      # 部署
       - name: Deploy
         run: |-
-          gcloud run deploy $APP_NAME \
-          --region $REGION \
-          --image $REGION-docker.pkg.dev/$PROJECT_ID/$REGISTRY_NAME/$APP_NAME:$GITHUB_SHA \
-          --platform "managed" \
-          --service-account $SERVICE_ACCOUNT_EMAIL \
-          --port 80 \
-          --quiet
+          gcloud components install beta --quiet
+          gcloud beta run deploy $REPO_NAME --image gcr.io/$CLOUD_RUN_PROJECT_ID/$REPO_NAME:$GITHUB_SHA \
+            --project $CLOUD_RUN_PROJECT_ID \
+            --platform managed \
+            --region $CLOUD_RUN_REGION \
+            --allow-unauthenticated \
+            --quiet
