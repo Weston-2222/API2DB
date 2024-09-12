@@ -1,7 +1,7 @@
 from sqlalchemy.orm import sessionmaker
 from config import DB
 from sqlalchemy import create_engine, inspect
-# 初始化数据库连接:
+# 初始化数据库連結:
 
 # 判断是否在 Google Cloud 环境中运行
 if DB.is_production:
