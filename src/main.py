@@ -49,7 +49,7 @@ def update_data():
         finally:
             # 關閉session
             session.close()
-            logger.info("数据库会话已关闭")
+            logger.info("数据库会话已關閉")
 
     except Exception as e:
         logger.error(f"更新过程中發生错误：{str(e)}")
