@@ -72,11 +72,7 @@ jobs:
           username: 'oauth2accesstoken'
           password: '${{ steps.auth.outputs.auth_token }}'
           registry: '${{ env.REGION }}-docker.pkg.dev'
-      - name: '验证 Google Cloud 身份'
-        run: |
-          gcloud auth list
-          gcloud config list
-          gcloud artifacts repositories list --project=${{ env.PROJECT_ID }}
+
       - name: 'Build and Push Container'
         run: |
           DOCKER_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
