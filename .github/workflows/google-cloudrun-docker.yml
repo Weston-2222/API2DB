@@ -105,3 +105,9 @@ jobs:
           echo "REGION: ${{ env.REGION }}"
           echo "PROJECT_ID: ${{ env.PROJECT_ID }}"
           echo "SERVICE: ${{ env.SERVICE }}"
+
+      - name: '验证 Google Cloud 身份'
+        run: |
+          gcloud auth list
+          gcloud config list
+          gcloud artifacts repositories list --project=${{ env.PROJECT_ID }}
