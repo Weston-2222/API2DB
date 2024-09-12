@@ -74,8 +74,9 @@ jobs:
           registry: '${{ env.REGION }}-docker.pkg.dev'
 
       - name: 'Build and Push Container'
-        run: |-
-          DOCKER_TAG="$${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
+        run: |
+          DOCKER_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
+          echo "Docker tag: ${DOCKER_TAG}"
           docker build --tag "${DOCKER_TAG}" .
           docker push "${DOCKER_TAG}"
       - name: 'Deploy to Cloud Run'
@@ -98,3 +99,9 @@ jobs:
         run: |
           echo "Workload Identity Provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}"
           echo "Project ID: ${{ env.PROJECT_ID }}"
+
+      - name: 'Debug Environment Variables'
+        run: |
+          echo "REGION: ${{ env.REGION }}"
+          echo "PROJECT_ID: ${{ env.PROJECT_ID }}"
+          echo "SERVICE: ${{ env.SERVICE }}"
