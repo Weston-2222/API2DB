@@ -27,5 +27,4 @@ if __name__ == "__main__":
         print("数据库中的表：", tables)
         print("连接成功")
     except Exception as e:
-        print(f"连接失败：{str(e)}")
-        print("连接失败")
+        print(f"連接失敗：{str(e)}")
