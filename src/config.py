@@ -17,3 +17,7 @@ class DB:
     PASSWORD = os.getenv("DATABASE_PASSWORD")
     CLOUD_SQL_CONNECTION_NAME = os.getenv("CLOUD_SQL_CONNECTION_NAME")
     is_production = os.getenv('GAE_ENV', '').startswith('standard')
+
+class News:
+    API_URL = os.getenv("API_URL_NEWS")
+    API_KEY = os.getenv("API_KEY_NEWS")
