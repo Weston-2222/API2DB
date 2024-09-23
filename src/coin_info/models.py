@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean, Float
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()

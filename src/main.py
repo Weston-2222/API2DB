@@ -2,9 +2,12 @@ import logging
 from coin_info.api_client import get_new_info
 from coin_info.models import coinInfoTransform
 from coin_info.services import upsert_many_coin_info
+from news.api_client import fetch_news
 from database import get_session
 from flask import Flask
 import os
+
+from news.services import update_news
 
 
 # 配置日志
@@ -22,6 +25,13 @@ def get_data():
     logger.info("接收到数据更新请求")
     update_data()
     return "Coin Info Service is running!"
+
+
+@app.route('/news')
+def get_news():
+    logger.info("接收到新聞数据请求")
+    update_news()
+    return "News Service is running!"
 
 
 def update_data():
